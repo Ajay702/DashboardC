@@ -19,6 +19,15 @@ const Dashboard = () => {
     source: '',
     sector: ''
   });
+  const [filterOptions, setFilterOptions] = useState({
+    endYearOptions: [],
+    topicOptions: [],
+    regionOptions: [],
+    countryOptions: [],
+    pestleOptions: [],
+    sourceOptions: [],
+    sectorOptions: []
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,6 +40,16 @@ const Dashboard = () => {
         setData(result);
         setFilteredData(result);
         setLoading(false);
+
+        setFilterOptions({
+          endYearOptions: [...new Set(result.map(item => item.end_year))].sort(),
+          topicOptions: [...new Set(result.map(item => item.topic))].sort(),
+          regionOptions: [...new Set(result.map(item => item.region))].sort(),
+          countryOptions: [...new Set(result.map(item => item.country))].sort(),
+          pestleOptions: [...new Set(result.map(item => item.pestle))].sort(),
+          sourceOptions: [...new Set(result.map(item => item.source))].sort(),
+          sectorOptions: [...new Set(result.map(item => item.sector))].sort(),
+        });
       } catch (error) {
         console.error('Error fetching data:', error);
         setLoading(false);
@@ -189,34 +208,19 @@ const Dashboard = () => {
     <div style={{ textAlign: 'center' }}>
       <h1>Data from API</h1>
       <div className="form-grid">
-        <label>
-          End Year:
-          <input type="text" name="endYear" value={filters.endYear} onChange={handleFilterChange} />
-        </label>
-        <label>
-          Topic:
-          <input type="text" name="topic" value={filters.topic} onChange={handleFilterChange} />
-        </label>
-        <label>
-          Region:
-          <input type="text" name="region" value={filters.region} onChange={handleFilterChange} />
-        </label>
-        <label>
-          Country:
-          <input type="text" name="country" value={filters.country} onChange={handleFilterChange} />
-        </label>
-        <label>
-          Pestle:
-          <input type="text" name="pestle" value={filters.pestle} onChange={handleFilterChange} />
-        </label>
-        <label>
-          Source:
-          <input type="text" name="source" value={filters.source} onChange={handleFilterChange} />
-        </label>
-        <label>
-          Sector:
-          <input type="text" name="sector" value={filters.sector} onChange={handleFilterChange} />
-        </label>
+        {Object.entries(filterOptions).map(([key, options]) => (
+          <label key={key}>
+            {key.replace('Options', '')}:
+            <select name={key.replace('Options', '')} value={filters[key.replace('Options', '')]} onChange={handleFilterChange}>
+              <option value="">Select...</option>
+              {options.map(option => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </label>
+        ))}
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap' }}>
